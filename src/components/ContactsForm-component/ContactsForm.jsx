@@ -8,6 +8,8 @@ import {
   LabelText,
 } from './ContactsForm.styled';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact, getContacts } from 'redux/contactsSlice';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -23,32 +25,43 @@ const validationSchema = Yup.object().shape({
     .max(15, 'Invalid phone number!'),
 });
 
-export const ContactsForm = ({ onAddContacts }) => (
-  <Formik
-    initialValues={{
-      name: '',
-      number: '',
-    }}
-    validationSchema={validationSchema}
-    onSubmit={(values, actions) => {
-      actions.resetForm();
-      onAddContacts(values);
-    }}
-  >
-    <Form>
-      <FormGroup>
-        <LabelText>Name</LabelText>
-        <Field name="name" type="text" placeholder="Kate Simpson" />
-        <ErrorMessage name="name" component="span" required />
-      </FormGroup>
+export const ContactsForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
-      <FormGroup>
-        <LabelText>Number</LabelText>
-        <Field name="number" type="tel" placeholder="+XX..." />
-        <ErrorMessage name="number" component="span" required />
-      </FormGroup>
+  return (
+    <Formik
+      initialValues={{
+        name: '',
+        number: '',
+      }}
+      validationSchema={validationSchema}
+      onSubmit={(values, actions) => {
+        actions.resetForm();
+        const contactAlreadyExist = contacts.some(
+          contact => contact.name.toLowerCase() === values.name.toLowerCase()
+        );
 
-      <AddContactButton type="submit">Add contact</AddContactButton>
-    </Form>
-  </Formik>
-);
+        contactAlreadyExist
+          ? alert(`${values.name} is already in contacts!`)
+          : dispatch(addContact(values));
+      }}
+    >
+      <Form>
+        <FormGroup>
+          <LabelText>Name</LabelText>
+          <Field name="name" type="text" placeholder="Kate Simpson" />
+          <ErrorMessage name="name" component="span" required />
+        </FormGroup>
+
+        <FormGroup>
+          <LabelText>Number</LabelText>
+          <Field name="number" type="tel" placeholder="+XX..." />
+          <ErrorMessage name="number" component="span" required />
+        </FormGroup>
+
+        <AddContactButton type="submit">Add contact</AddContactButton>
+      </Form>
+    </Formik>
+  );
+};

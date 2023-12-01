@@ -1,3 +1,5 @@
+import { deleteContact } from 'redux/contactsSlice';
+import { useDispatch } from 'react-redux';
 import {
   ContactItem,
   DeleteButton,
@@ -7,21 +9,23 @@ import {
   ContactIcon,
 } from './ContactListItem.styled';
 
-export const ContactListItem = ({
-  contactId,
-  contactName,
-  contactNumber,
-  onDelete,
-}) => (
-  <ContactItem>
-    <ContactWrapper>
-      <ContactIcon />
-      <ContactOfPeople>
-        {contactName}: <PhoneNumber>{contactNumber}</PhoneNumber>
-      </ContactOfPeople>
-    </ContactWrapper>
-    <DeleteButton type="button" onClick={() => onDelete(contactId)}>
-      Delete
-    </DeleteButton>
-  </ContactItem>
-);
+export const ContactListItem = ({ contactId, contactName, contactNumber }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <ContactItem>
+      <ContactWrapper>
+        <ContactIcon />
+        <ContactOfPeople>
+          {contactName}: <PhoneNumber>{contactNumber}</PhoneNumber>
+        </ContactOfPeople>
+      </ContactWrapper>
+      <DeleteButton
+        type="button"
+        onClick={() => dispatch(deleteContact(contactId))}
+      >
+        Delete
+      </DeleteButton>
+    </ContactItem>
+  );
+};
